@@ -83,7 +83,7 @@ async fn read_analytics(
 #[tokio::main]
 async fn main() {
     let analytical_store = Arc::new(RwLock::new(HashMap::new()));
-    let (tx, rx) = mpsc::channel::<SearchLogEvent>(10_000);
+    let (tx, rx) = mpsc::channel::<SearchLogEvent>(10_000); // tx/rx: channel for streaming events
 
     start_streaming_worker(rx, Arc::clone(&analytical_store));
 
@@ -97,8 +97,8 @@ async fn main() {
         .route("/analytics/:query", get(read_analytics))
         .with_state(engine_state);
 
-    let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
-    println!("Decoupled Production Data Engine running at http://127.0.0.1:3000");
+    let listener = TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    println!("Data Engine running at http://0.0.0.0:3000");
 
     axum::serve(listener, app).await.unwrap();
 }
