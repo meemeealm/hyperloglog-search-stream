@@ -1,0 +1,21 @@
+/target/
+
+# --- Backup and Data Files ---
+*.json
+*.log
+
+# --- IDEs and Text Editors ---
+# IntelliJ / RustRover
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Vim / Emacs swap files
+*~
+*.swp
+
+# --- OS Specific Files ---
+.DS_Store
+Thumbs.db
