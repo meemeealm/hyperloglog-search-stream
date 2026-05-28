@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # --- 1. Rust HyperLogLog Engine ---
+  rust-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Maps port 3000 to laptop to use in browser
+    networks:
+      - stream-network
+
+  # --- 2. Python Data Stream ---
+  python-streamer:
+    image: python:3.11-slim
+    volumes:
+      - .:/app # Shares your current folder with the container so it can see test_stream.py
+    working_dir: /app
+    command: python test_stream.py
+    depends_on:
+      - rust-engine # Tells Docker to wait until the Rust app starts up first
+    environment:
+      - ENGINE_URL=http://rust-engine:3000
+    networks:
+      - stream-network
+
+  redis:
+    image: redis:alpine
+    ports: 
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - stream-network
+
+volumes:
+  redis_data:
+
+# Create a shared private network for the containers to talk to each other
+networks:
+  stream-network:
+    driver: bridge
